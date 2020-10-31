@@ -1,8 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 # TODO
-# - Implement restart after victory
+# - Add restart after rémi
 # - Implement restart button (R on keyboard)
+# - Implement quit option
 
 # TODO (extra)
 # - Add player selection (other colors, new shapes)
@@ -14,6 +15,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # - Make it possible to choose who to start
 # - Fix inconsistent use of '' and ""
 # - Find a different way of setting white color on the button after win
+# - Add the game to a server? (PvP online)
 
 class Ui_MainWindow(object):
     
@@ -29,37 +31,36 @@ class Ui_MainWindow(object):
     # Victories for games played
     score = {'Blue': 0, 'Red': 0}
 
+
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("Tic Tac Toe")
+        MainWindow.setObjectName("TicTacToe")
         MainWindow.resize(780, 580)
+        
         palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(120, 120, 120))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        
+        active = QtGui.QPalette.Active
+        inactive = QtGui.QPalette.Inactive
+        disabled = QtGui.QPalette.Disabled
+
+        winText = QtGui.QPalette.WindowText
+        base = QtGui.QPalette.Base
+        win = QtGui.QPalette.Window
+
+        # Active
+        self.setPalette(0, 0, 0, active, winText, palette)      # Hover over Restart to see this text
+        self.setPalette(255, 255, 255, active, base, palette)   # 
+        self.setPalette(255, 255, 255, active, win, palette)    # Background
+
+        # Inactive
+        self.setPalette(0, 0, 0, inactive, winText, palette)
+        self.setPalette(255, 255, 255, inactive, base, palette)
+        self.setPalette(255, 255, 255, inactive, win, palette)
+
+        # Disabled
+        self.setPalette(120, 120, 120, disabled, winText, palette)
+        self.setPalette(255, 255, 255, disabled, base, palette)
+        self.setPalette(255, 255, 255, disabled, win, palette)
+        
         MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -90,60 +91,26 @@ class Ui_MainWindow(object):
         self.Map.setObjectName("Map")
         self.Map.setStyleSheet("background-image: url(img/map.png)")
 
-        # Buttons
         self.Button1 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button1.setGeometry(QtCore.QRect(180, 90, 137, 137))
-        self.Button1.setObjectName("Button1")
-        self.Button1.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button1.setCheckable(True)
-        
         self.Button2 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button2.setGeometry(QtCore.QRect(325, 90, 133, 137))
-        self.Button2.setObjectName("Button2")
-        self.Button2.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button2.setCheckable(True)
-        
         self.Button3 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button3.setGeometry(QtCore.QRect(466, 90, 134, 137))
-        self.Button3.setObjectName("Button3")
-        self.Button3.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button3.setCheckable(True)
-        
         self.Button4 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button4.setGeometry(QtCore.QRect(180, 235, 137, 133))
-        self.Button4.setObjectName("Button4")
-        self.Button4.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button4.setCheckable(True)
-
         self.Button5 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button5.setGeometry(QtCore.QRect(325, 235, 133, 134))
-        self.Button5.setObjectName("Button5")
-        self.Button5.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button5.setCheckable(True)
-
         self.Button6 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button6.setGeometry(QtCore.QRect(466, 235, 134, 134))
-        self.Button6.setObjectName("Button6")
-        self.Button6.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button6.setCheckable(True)
-
         self.Button7 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button7.setGeometry(QtCore.QRect(180, 376, 137, 134))
-        self.Button7.setObjectName("Button7")
-        self.Button7.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button7.setCheckable(True)
-
         self.Button8 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button8.setGeometry(QtCore.QRect(325, 376, 133, 134))
-        self.Button8.setObjectName("Button8")
-        self.Button8.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button8.setCheckable(True)
-
         self.Button9 = QtWidgets.QPushButton(self.centralwidget)
-        self.Button9.setGeometry(QtCore.QRect(466, 376, 134, 134))
-        self.Button9.setObjectName("Button9")
-        self.Button9.setStyleSheet("background-color:rgb(255, 255, 255)")
-        self.Button9.setCheckable(True)
+
+        # Buttons
+        self.initButtons(self.Button1, 1, 180, 90, 137, 137, self.centralwidget)
+        self.initButtons(self.Button2, 2, 325, 90, 133, 137, self.centralwidget)
+        self.initButtons(self.Button3, 3, 466, 90, 134, 137, self.centralwidget)
+        self.initButtons(self.Button4, 4, 180, 235, 137, 133, self.centralwidget)
+        self.initButtons(self.Button5, 5, 325, 235, 133, 134, self.centralwidget)
+        self.initButtons(self.Button6, 6, 466, 235, 134, 134, self.centralwidget)
+        self.initButtons(self.Button7, 7, 180, 376, 137, 134, self.centralwidget)
+        self.initButtons(self.Button8, 8, 325, 376, 133, 134, self.centralwidget)
+        self.initButtons(self.Button9, 9, 466, 376, 134, 134, self.centralwidget)
 
         # Menubar
         MainWindow.setCentralWidget(self.centralwidget)
@@ -165,12 +132,26 @@ class Ui_MainWindow(object):
         self.menuRestart.addAction(self.actionRestart)
         self.menubar.addAction(self.menuRestart.menuAction())
 
-        self.retranslateUi(MainWindow)
+        self.initUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         # Calls of functions to start game
         self.initButtonLog()
+        self.initScore()
         self.showPlayer()
+
+
+    def setPalette(self, red, green, blue, qPaletteMode, qPalettePlace, palette):
+        brush = QtGui.QBrush(QtGui.QColor(red, green, blue))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(qPaletteMode, qPalettePlace, brush)
+
+
+    def initButtons(self, button, buttonNum, x, y, w, h, centralwidget):
+        button.setGeometry(QtCore.QRect(x, y, w, h))
+        button.setObjectName(str(buttonNum))
+        button.setStyleSheet("background-color:rgb(255, 255, 255)")
+        button.setCheckable(True)
 
 
     # Creates a dictionary that hold the start state of all buttons
@@ -178,6 +159,11 @@ class Ui_MainWindow(object):
         for button in self.buttons:
             self.playerState[button] = ""
         print(self.playerState)
+
+
+    def initScore(self):
+        self.ScoreRed.setText(str(self.score['Red']))
+        self.ScoreBlue.setText(str(self.score['Blue']))
 
 
     def showPlayer(self):
@@ -466,7 +452,6 @@ class Ui_MainWindow(object):
     # Wipe all players off map and restarts game
     def victoryRestart(self):
         self.initButtonLog()
-        # Wipe of players
         self.Button1.setIcon(QtGui.QIcon("img/whiteBG.png"))
         self.Button2.setIcon(QtGui.QIcon("img/whiteBG.png"))
         self.Button3.setIcon(QtGui.QIcon("img/whiteBG.png"))
@@ -478,9 +463,7 @@ class Ui_MainWindow(object):
         self.Button9.setIcon(QtGui.QIcon("img/whiteBG.png"))
 
 
-
-
-    def retranslateUi(self, MainWindow):
+    def initUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "TicTacToe"))
         self.menuRestart.setTitle(_translate("MainWindow", "File"))
