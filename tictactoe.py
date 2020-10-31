@@ -1,12 +1,33 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+# TODO
+# - Implement victory (3 in a row)
+# - Implement score
+# - Implement restart after victory
+# - Implement restart button (R on keyboard)
+
+# TODO (extra)
+# - Add player selection (other colors, new shapes)
+# - Add start menu
+# - Add PvComputer
+# - Add Player indicator (whos turn it is)
+# - Make code more modular
+# - Make it possible to choose who to start
+
 class Ui_MainWindow(object):
-   
+    
+    # Player who starts the game
     baseState = "Red"
+
+    # Player tiles
     buttons = ["Button1", "Button2", "Button3", "Button4", "Button5", "Button6", "Button7", "Button8", "Button9"]
+    
+    # Log of activated player tiles
     playerState = {}
-    score = {}
-   
+    
+    # Victories for games played
+    score = {'Blue': 0, 'Red': 0}
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("Tic Tac Toe")
         MainWindow.resize(780, 580)
@@ -42,21 +63,25 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         
-        # Score Blue player
-        # self.ScoreBlue = QtWidgets.QLabel(self.centralwidget)
-        # self.ScoreBlue.setGeometry(QtCore.QRect(180, 5, 200, 80))
-        # self.ScoreBlue.setText("0")
-        self.ScoreBlue = QtWidgets.QTextBrowser(self.centralwidget)
-        self.ScoreBlue.setGeometry(QtCore.QRect(180, 5, 200, 80))
-        self.ScoreBlue.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.ScoreBlue.setObjectName("ScoreBlue")
-        
-        #Score Red player
-        self.ScoreRed = QtWidgets.QTextBrowser(self.centralwidget)
-        self.ScoreRed.setGeometry(QtCore.QRect(400, 5, 200, 80))
-        self.ScoreRed.setAutoFillBackground(False)
-        self.ScoreRed.setFrameShadow(QtWidgets.QFrame.Sunken)
+        # Score Red player
+        self.ScoreRed = QtWidgets.QLabel(self.centralwidget)
+        self.ScoreRed.setGeometry(QtCore.QRect(180, 5, 200, 80))
         self.ScoreRed.setObjectName("ScoreRed")
+        self.ScoreRed.setFont(QtGui.QFont("Arial", 20))
+        self.ScoreRed.setAlignment(QtCore.Qt.AlignCenter)
+        self.colorEffectRed = QtWidgets.QGraphicsColorizeEffect()
+        self.colorEffectRed.setColor(QtGui.QColor(0,0,255))
+        self.ScoreRed.setGraphicsEffect(self.colorEffectRed)
+        
+        # Score Blue player
+        self.ScoreBlue = QtWidgets.QLabel(self.centralwidget)
+        self.ScoreBlue.setGeometry(QtCore.QRect(400, 5, 200, 80))
+        self.ScoreBlue.setObjectName("ScoreBlue")
+        self.ScoreBlue.setFont(QtGui.QFont("Arial", 20))
+        self.ScoreBlue.setAlignment(QtCore.Qt.AlignCenter)
+        self.colorEffectBlue = QtWidgets.QGraphicsColorizeEffect()
+        self.colorEffectBlue.setColor(QtGui.QColor(255,0,0))
+        self.ScoreBlue.setGraphicsEffect(self.colorEffectBlue)
         
         # Map
         self.Map = QtWidgets.QLabel(self.centralwidget)
@@ -141,57 +166,47 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
+
+        # Calls of functions to start game
         self.initButtonLog()
-        self.initScore()
         self.showPlayer()
         self.updateButtonLog()
-        self.updateScore()
+        self.scoreUpdate() # scoreUpdate is called just to see some text on screen
 
+    # Creates a dictionary that hold the start state of all buttons
     def initButtonLog(self):
         for button in self.buttons:
             self.playerState[button] = ""
         print(self.playerState)
 
-    def initScore(self):
-        self.score['Blue'] = 0
-        self.score['Red']  = 0
-        # self.ScoreBlue.setText(str(self.score["Blue"]))
-        # self.ScoreRed.setMarkdown(str(self.score["Red"]))
-
+    def scoreUpdate(self):
+        # Testing stuff
+        
+        self.score['Blue'] += 1
+        self.score['Red'] += 1
+        self.ScoreBlue.setText(str(self.score['Blue']))
+        self.ScoreRed.setText(str(self.score['Red']))
 
         # Setup is done
-#     def updateUI(self, MainWindow):
-#         self.showPlayer(self)
-#         self.updateButtonLog()
-#         self.updateScore()
+    # def updateUI(self, MainWindow):
+    #     self.showPlayer(self)
+        # self.updateButtonLog()
+        # self.updateScore()
 
     def showPlayer(self):
         if self.baseState == "Red":
-            self.Button1.clicked.connect(self.addRedPlayer)
-            self.Button2.clicked.connect(self.addRedPlayer)
-            self.Button3.clicked.connect(self.addRedPlayer)
-            self.Button4.clicked.connect(self.addRedPlayer)
-            self.Button5.clicked.connect(self.addRedPlayer)
-            self.Button6.clicked.connect(self.addRedPlayer)
-            self.Button7.clicked.connect(self.addRedPlayer)
-            self.Button8.clicked.connect(self.addRedPlayer)
-            self.Button9.clicked.connect(self.addRedPlayer)
-        
-        elif self.baseState == "Blue":
-            self.Button1.clicked.connect(self.addBluePlayer)
-            self.Button2.clicked.connect(self.addBluePlayer)
-            self.Button3.clicked.connect(self.addBluePlayer)
-            self.Button4.clicked.connect(self.addBluePlayer)
-            self.Button5.clicked.connect(self.addBluePlayer)
-            self.Button6.clicked.connect(self.addBluePlayer)
-            self.Button7.clicked.connect(self.addBluePlayer)
-            self.Button8.clicked.connect(self.addBluePlayer)
-            self.Button9.clicked.connect(self.addBluePlayer)
-            self.baseState = "Red"
+            self.Button1.clicked.connect(self.addPlayer)
+            self.Button2.clicked.connect(self.addPlayer)
+            self.Button3.clicked.connect(self.addPlayer)
+            self.Button4.clicked.connect(self.addPlayer)
+            self.Button5.clicked.connect(self.addPlayer)
+            self.Button6.clicked.connect(self.addPlayer)
+            self.Button7.clicked.connect(self.addPlayer)
+            self.Button8.clicked.connect(self.addPlayer)
+            self.Button9.clicked.connect(self.addPlayer)
 
-    def addRedPlayer(self):
-        if   self.Button1.isChecked() & (self.baseState == "Red") & (self.playerState["Button1"] == ""):
+    def addPlayer(self):
+        if  self.Button1.isChecked() & (self.baseState == "Red") & (self.playerState["Button1"] == ""):
             self.playerState["Button1"] = self.baseState
             self.baseState = "Blue"
             print("B1")
@@ -382,26 +397,10 @@ class Ui_MainWindow(object):
         y=2
         # Need implementation
         
-    def updateScore(self):
-        x=2
-        #Need implementation
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.ScoreBlue.setMarkdown(_translate("MainWindow", "Score\n"
-"\n"
-""))
-        self.ScoreBlue.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:26pt; color:#0000ff;\">Score</span></p></body></html>"))
-        self.ScoreRed.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:26pt; color:#ff0000;\">Score</span></p></body></html>"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "TicTacToe"))
         self.menuRestart.setTitle(_translate("MainWindow", "File"))
         self.actionRestart.setText(_translate("MainWindow", "Restart"))
         self.actionRestart.setStatusTip(_translate("MainWindow", "Restart the game"))
