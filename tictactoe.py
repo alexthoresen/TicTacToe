@@ -1,18 +1,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 # TODO
-# - Implement victory (3 in a row)
-# - Implement score
 # - Implement restart after victory
 # - Implement restart button (R on keyboard)
 
 # TODO (extra)
 # - Add player selection (other colors, new shapes)
 # - Add start menu
-# - Add PvComputer
 # - Add Player indicator (whos turn it is)
+# - Add delay after win, such that the TicTacToe can be seen
 # - Make code more modular
+# - Add PvComputer
 # - Make it possible to choose who to start
+# - Fix inconsistent use of '' and ""
+# - Find a different way of setting white color on the button after win
 
 class Ui_MainWindow(object):
     
@@ -67,20 +68,20 @@ class Ui_MainWindow(object):
         self.ScoreRed = QtWidgets.QLabel(self.centralwidget)
         self.ScoreRed.setGeometry(QtCore.QRect(180, 5, 200, 80))
         self.ScoreRed.setObjectName("ScoreRed")
-        self.ScoreRed.setFont(QtGui.QFont("Arial", 20))
+        self.ScoreRed.setFont(QtGui.QFont("Arial", 30))
         self.ScoreRed.setAlignment(QtCore.Qt.AlignCenter)
         self.colorEffectRed = QtWidgets.QGraphicsColorizeEffect()
-        self.colorEffectRed.setColor(QtGui.QColor(0,0,255))
+        self.colorEffectRed.setColor(QtGui.QColor(255,0,0))
         self.ScoreRed.setGraphicsEffect(self.colorEffectRed)
         
         # Score Blue player
         self.ScoreBlue = QtWidgets.QLabel(self.centralwidget)
         self.ScoreBlue.setGeometry(QtCore.QRect(400, 5, 200, 80))
         self.ScoreBlue.setObjectName("ScoreBlue")
-        self.ScoreBlue.setFont(QtGui.QFont("Arial", 20))
+        self.ScoreBlue.setFont(QtGui.QFont("Arial", 30))
         self.ScoreBlue.setAlignment(QtCore.Qt.AlignCenter)
         self.colorEffectBlue = QtWidgets.QGraphicsColorizeEffect()
-        self.colorEffectBlue.setColor(QtGui.QColor(255,0,0))
+        self.colorEffectBlue.setColor(QtGui.QColor(0,0,255))
         self.ScoreBlue.setGraphicsEffect(self.colorEffectBlue)
         
         # Map
@@ -170,8 +171,7 @@ class Ui_MainWindow(object):
         # Calls of functions to start game
         self.initButtonLog()
         self.showPlayer()
-        self.updateButtonLog()
-        self.scoreUpdate() # scoreUpdate is called just to see some text on screen
+
 
     # Creates a dictionary that hold the start state of all buttons
     def initButtonLog(self):
@@ -179,19 +179,6 @@ class Ui_MainWindow(object):
             self.playerState[button] = ""
         print(self.playerState)
 
-    def scoreUpdate(self):
-        # Testing stuff
-        
-        self.score['Blue'] += 1
-        self.score['Red'] += 1
-        self.ScoreBlue.setText(str(self.score['Blue']))
-        self.ScoreRed.setText(str(self.score['Red']))
-
-        # Setup is done
-    # def updateUI(self, MainWindow):
-    #     self.showPlayer(self)
-        # self.updateButtonLog()
-        # self.updateScore()
 
     def showPlayer(self):
         if self.baseState == "Red":
@@ -205,6 +192,8 @@ class Ui_MainWindow(object):
             self.Button8.clicked.connect(self.addPlayer)
             self.Button9.clicked.connect(self.addPlayer)
 
+
+    # Implement all functionality here for now
     def addPlayer(self):
         if  self.Button1.isChecked() & (self.baseState == "Red") & (self.playerState["Button1"] == ""):
             self.playerState["Button1"] = self.baseState
@@ -236,7 +225,6 @@ class Ui_MainWindow(object):
             self.Button2.setIcon(QtGui.QIcon("img/redPlayer.png"))
             self.Button2.setIconSize(QtCore.QSize(140,140))
             self.Button2.toggle()
-            # self.Button1.setCheckable(False)
         
         elif self.Button2.isChecked() & (self.baseState == "Blue") & (self.playerState["Button2"] == ""):
             self.playerState["Button2"] = self.baseState
@@ -391,12 +379,106 @@ class Ui_MainWindow(object):
         else:
             print("Already pressed!")
         
-
-
-    def updateButtonLog(self):
-        y=2
-        # Need implementation
+        # Restart game
+        if self.victoryConditions():
+            # Need implementation
+            self.victoryRestart()
         
+
+    # 8 ways to win - returns True if player win
+    def victoryConditions(self):
+        # Victory for red player:
+        # Horizontal wins
+        if (self.playerState['Button1'] == 'Red') & (self.playerState['Button2'] == 'Red') & (self.playerState['Button3'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        elif (self.playerState['Button4'] == 'Red') & (self.playerState['Button5'] == 'Red') & (self.playerState['Button6'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        elif (self.playerState['Button7'] == 'Red') & (self.playerState['Button8'] == 'Red') & (self.playerState['Button9'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        # Vertical wins
+        elif (self.playerState['Button1'] == 'Red') & (self.playerState['Button4'] == 'Red') & (self.playerState['Button7'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        elif (self.playerState['Button2'] == 'Red') & (self.playerState['Button5'] == 'Red') & (self.playerState['Button8'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        elif (self.playerState['Button3'] == 'Red') & (self.playerState['Button6'] == 'Red') & (self.playerState['Button9'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        # Diagonal wins
+        elif (self.playerState['Button1'] == 'Red') & (self.playerState['Button5'] == 'Red') & (self.playerState['Button9'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+        elif (self.playerState['Button3'] == 'Red') & (self.playerState['Button5'] == 'Red') & (self.playerState['Button7'] == 'Red'):
+            self.score['Red'] += 1
+            self.ScoreRed.setText(str(self.score['Red']))
+            return True
+
+        # Victory for blue player:
+        # Horizontal wins
+        if (self.playerState['Button1'] == 'Blue') & (self.playerState['Button2'] == 'Blue') & (self.playerState['Button3'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        elif (self.playerState['Button4'] == 'Blue') & (self.playerState['Button5'] == 'Blue') & (self.playerState['Button6'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        elif (self.playerState['Button7'] == 'Blue') & (self.playerState['Button8'] == 'Blue') & (self.playerState['Button9'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        # Vertical wins
+        elif (self.playerState['Button1'] == 'Blue') & (self.playerState['Button4'] == 'Blue') & (self.playerState['Button7'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        elif (self.playerState['Button2'] == 'Blue') & (self.playerState['Button5'] == 'Blue') & (self.playerState['Button8'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        elif (self.playerState['Button3'] == 'Blue') & (self.playerState['Button6'] == 'Blue') & (self.playerState['Button9'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        # Diagonal wins
+        elif (self.playerState['Button1'] == 'Blue') & (self.playerState['Button5'] == 'Blue') & (self.playerState['Button9'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        elif (self.playerState['Button3'] == 'Blue') & (self.playerState['Button5'] == 'Blue') & (self.playerState['Button7'] == 'Blue'):
+            self.score['Blue'] += 1
+            self.ScoreBlue.setText(str(self.score['Blue']))
+            return True
+        return False
+
+
+    # Wipe all players off map and restarts game
+    def victoryRestart(self):
+        self.initButtonLog()
+        # Wipe of players
+        self.Button1.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button2.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button3.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button4.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button5.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button6.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button7.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button8.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button9.setIcon(QtGui.QIcon("img/whiteBG.png"))
+
+
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -413,6 +495,5 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-#     ui.updateUI(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
