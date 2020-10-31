@@ -1,9 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 # TODO
-# - Add restart after rémi
 # - Implement restart button (R on keyboard)
 # - Implement quit option
+# - Fix bug where player is placed a different place after win
 
 # TODO (extra)
 # - Add player selection (other colors, new shapes)
@@ -13,38 +13,39 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # - Make code more modular
 # - Add PvComputer
 # - Make it possible to choose who to start
-# - Fix inconsistent use of '' and ""
 # - Find a different way of setting white color on the button after win
 # - Add the game to a server? (PvP online)
 
 class Ui_MainWindow(object):
-    
-    # Player who starts the game
-    baseState = "Red"
 
+    # Amount of player on the map
+    playersOnMap = 0
+    # Log of activated/unactivated player tiles
+    playerState  = {}
+    # Player who starts the game
+    baseState    = 'Red'
+    # Victories for played games
+    score        = {'Blue': 0, 'Red': 0}
     # Player tiles
-    buttons = ["Button1", "Button2", "Button3", "Button4", "Button5", "Button6", "Button7", "Button8", "Button9"]
-    
-    # Log of activated player tiles
-    playerState = {}
-    
-    # Victories for games played
-    score = {'Blue': 0, 'Red': 0}
+    buttons      = ['Button1', 'Button2', 'Button3', 'Button4', 'Button5', 'Button6', 'Button7', 'Button8', 'Button9']
 
 
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("TicTacToe")
+        MainWindow.setObjectName('TicTacToe')
         MainWindow.resize(780, 580)
-        
-        palette = QtGui.QPalette()
-        
-        active = QtGui.QPalette.Active
+
+        # Palette for coloring        
+        palette  = QtGui.QPalette()
+
+        # Palette mode
+        active   = QtGui.QPalette.Active
         inactive = QtGui.QPalette.Inactive
         disabled = QtGui.QPalette.Disabled
 
-        winText = QtGui.QPalette.WindowText
-        base = QtGui.QPalette.Base
-        win = QtGui.QPalette.Window
+        # Palette type
+        winText  = QtGui.QPalette.WindowText
+        base     = QtGui.QPalette.Base
+        win      = QtGui.QPalette.Window
 
         # Active
         self.setPalette(0, 0, 0, active, winText, palette)      # Hover over Restart to see this text
@@ -63,13 +64,13 @@ class Ui_MainWindow(object):
         
         MainWindow.setPalette(palette)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
+        self.centralwidget.setObjectName('centralwidget')
         
         # Score Red player
         self.ScoreRed = QtWidgets.QLabel(self.centralwidget)
         self.ScoreRed.setGeometry(QtCore.QRect(180, 5, 200, 80))
-        self.ScoreRed.setObjectName("ScoreRed")
-        self.ScoreRed.setFont(QtGui.QFont("Arial", 30))
+        self.ScoreRed.setObjectName('ScoreRed')
+        self.ScoreRed.setFont(QtGui.QFont('Arial', 30))
         self.ScoreRed.setAlignment(QtCore.Qt.AlignCenter)
         self.colorEffectRed = QtWidgets.QGraphicsColorizeEffect()
         self.colorEffectRed.setColor(QtGui.QColor(255,0,0))
@@ -78,8 +79,8 @@ class Ui_MainWindow(object):
         # Score Blue player
         self.ScoreBlue = QtWidgets.QLabel(self.centralwidget)
         self.ScoreBlue.setGeometry(QtCore.QRect(400, 5, 200, 80))
-        self.ScoreBlue.setObjectName("ScoreBlue")
-        self.ScoreBlue.setFont(QtGui.QFont("Arial", 30))
+        self.ScoreBlue.setObjectName('ScoreBlue')
+        self.ScoreBlue.setFont(QtGui.QFont('Arial', 30))
         self.ScoreBlue.setAlignment(QtCore.Qt.AlignCenter)
         self.colorEffectBlue = QtWidgets.QGraphicsColorizeEffect()
         self.colorEffectBlue.setColor(QtGui.QColor(0,0,255))
@@ -88,8 +89,8 @@ class Ui_MainWindow(object):
         # Map
         self.Map = QtWidgets.QLabel(self.centralwidget)
         self.Map.setGeometry(QtCore.QRect(180, 90, 420, 420))
-        self.Map.setObjectName("Map")
-        self.Map.setStyleSheet("background-image: url(img/map.png)")
+        self.Map.setObjectName('Map')
+        self.Map.setStyleSheet('background-image: url(img/map.png)')
 
         self.Button1 = QtWidgets.QPushButton(self.centralwidget)
         self.Button2 = QtWidgets.QPushButton(self.centralwidget)
@@ -116,19 +117,19 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 780, 26))
-        self.menubar.setObjectName("menubar")
+        self.menubar.setObjectName('menubar')
         
         self.menuRestart = QtWidgets.QMenu(self.menubar)
-        self.menuRestart.setObjectName("menuRestart")
+        self.menuRestart.setObjectName('menuRestart')
         
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
+        self.statusbar.setObjectName('statusbar')
 
         # Restart option
         MainWindow.setStatusBar(self.statusbar)
         self.actionRestart = QtWidgets.QAction(MainWindow)
-        self.actionRestart.setObjectName("actionRestart")
+        self.actionRestart.setObjectName('actionRestart')
         self.menuRestart.addAction(self.actionRestart)
         self.menubar.addAction(self.menuRestart.menuAction())
 
@@ -150,14 +151,14 @@ class Ui_MainWindow(object):
     def initButtons(self, button, buttonNum, x, y, w, h, centralwidget):
         button.setGeometry(QtCore.QRect(x, y, w, h))
         button.setObjectName(str(buttonNum))
-        button.setStyleSheet("background-color:rgb(255, 255, 255)")
+        button.setStyleSheet('background-color:rgb(255, 255, 255)')
         button.setCheckable(True)
 
 
     # Creates a dictionary that hold the start state of all buttons
     def initButtonLog(self):
         for button in self.buttons:
-            self.playerState[button] = ""
+            self.playerState[button] = ''
         print(self.playerState)
 
 
@@ -167,7 +168,7 @@ class Ui_MainWindow(object):
 
 
     def showPlayer(self):
-        if self.baseState == "Red":
+        if self.baseState == 'Red':
             self.Button1.clicked.connect(self.addPlayer)
             self.Button2.clicked.connect(self.addPlayer)
             self.Button3.clicked.connect(self.addPlayer)
@@ -181,195 +182,221 @@ class Ui_MainWindow(object):
 
     # Implement all functionality here for now
     def addPlayer(self):
-        if  self.Button1.isChecked() & (self.baseState == "Red") & (self.playerState["Button1"] == ""):
-            self.playerState["Button1"] = self.baseState
-            self.baseState = "Blue"
-            print("B1")
+        if  self.Button1.isChecked() & (self.baseState == 'Red') & (self.playerState['Button1'] == ''):
+            self.playerState['Button1'] = self.baseState
+            self.baseState = 'Blue'
+            print('B1')
             print(self.playerState)
 
-            self.Button1.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button1.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button1.setIconSize(QtCore.QSize(140,140))
             self.Button1.toggle()
-            # self.Button1.setCheckable(False)
+            self.playersOnMap += 1
         
-        elif self.Button1.isChecked() & (self.baseState == "Blue") & (self.playerState["Button1"] == ""):
-            self.playerState["Button1"] = self.baseState
-            self.baseState = "Red"
-            print("B1")
+        elif self.Button1.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button1'] == ''):
+            self.playerState['Button1'] = self.baseState
+            self.baseState = 'Red'
+            print('B1')
             print(self.playerState)
 
-            self.Button1.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button1.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button1.setIconSize(QtCore.QSize(140,140))
             self.Button1.toggle()
-        
-        elif self.Button2.isChecked() & (self.baseState == "Red") & (self.playerState["Button2"] == ""):
-            self.playerState["Button2"] = self.baseState
-            self.baseState = "Blue"
-            print("B2")
+            self.playersOnMap += 1
+
+        elif self.Button2.isChecked() & (self.baseState == 'Red') & (self.playerState['Button2'] == ''):
+            self.playerState['Button2'] = self.baseState
+            self.baseState = 'Blue'
+            print('B2')
             print(self.playerState)
 
-            self.Button2.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button2.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button2.setIconSize(QtCore.QSize(140,140))
             self.Button2.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button2.isChecked() & (self.baseState == "Blue") & (self.playerState["Button2"] == ""):
-            self.playerState["Button2"] = self.baseState
-            self.baseState = "Red"
-            print("B2")
+        elif self.Button2.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button2'] == ''):
+            self.playerState['Button2'] = self.baseState
+            self.baseState = 'Red'
+            print('B2')
             print(self.playerState)
 
-            self.Button2.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button2.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button2.setIconSize(QtCore.QSize(140,140))
             self.Button2.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button3.isChecked() & (self.baseState == "Red") & (self.playerState["Button3"] == ""):
-            self.playerState["Button3"] = self.baseState
-            self.baseState = "Blue"
-            print("B3")
+        elif self.Button3.isChecked() & (self.baseState == 'Red') & (self.playerState['Button3'] == ''):
+            self.playerState['Button3'] = self.baseState
+            self.baseState = 'Blue'
+            print('B3')
             print(self.playerState)
 
-            self.Button3.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button3.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button3.setIconSize(QtCore.QSize(140,140))
             self.Button3.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button3.isChecked() & (self.baseState == "Blue") & (self.playerState["Button3"] == ""):
-            self.playerState["Button3"] = self.baseState
-            self.baseState = "Red"
-            print("B3")
+        elif self.Button3.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button3'] == ''):
+            self.playerState['Button3'] = self.baseState
+            self.baseState = 'Red'
+            print('B3')
             print(self.playerState)
 
-            self.Button3.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button3.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button3.setIconSize(QtCore.QSize(140,140))
             self.Button3.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button4.isChecked() & (self.baseState == "Red") & (self.playerState["Button4"] == ""):
-            self.playerState["Button4"] = self.baseState
-            self.baseState = "Blue"
-            print("B4")
+        elif self.Button4.isChecked() & (self.baseState == 'Red') & (self.playerState['Button4'] == ''):
+            self.playerState['Button4'] = self.baseState
+            self.baseState = 'Blue'
+            print('B4')
             print(self.playerState)
 
-            self.Button4.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button4.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button4.setIconSize(QtCore.QSize(140,140))
             self.Button4.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button4.isChecked() & (self.baseState == "Blue") & (self.playerState["Button4"] == ""):
-            self.playerState["Button4"] = self.baseState
-            self.baseState = "Red"
-            print("B4")
+        elif self.Button4.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button4'] == ''):
+            self.playerState['Button4'] = self.baseState
+            self.baseState = 'Red'
+            print('B4')
             print(self.playerState)
 
-            self.Button4.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button4.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button4.setIconSize(QtCore.QSize(140,140))
             self.Button4.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button5.isChecked() & (self.baseState == "Red") & (self.playerState["Button5"] == ""):
-            self.playerState["Button5"] = self.baseState
-            self.baseState = "Blue"
-            print("B5")
+        elif self.Button5.isChecked() & (self.baseState == 'Red') & (self.playerState['Button5'] == ''):
+            self.playerState['Button5'] = self.baseState
+            self.baseState = 'Blue'
+            print('B5')
             print(self.playerState)
 
-            self.Button5.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button5.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button5.setIconSize(QtCore.QSize(140,140))
             self.Button5.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button5.isChecked() & (self.baseState == "Blue") & (self.playerState["Button5"] == ""):
-            self.playerState["Button5"] = self.baseState
-            self.baseState = "Red"
-            print("B5")
+        elif self.Button5.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button5'] == ''):
+            self.playerState['Button5'] = self.baseState
+            self.baseState = 'Red'
+            print('B5')
             print(self.playerState)
 
-            self.Button5.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button5.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button5.setIconSize(QtCore.QSize(140,140))
             self.Button5.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button6.isChecked() & (self.baseState == "Red") & (self.playerState["Button6"] == ""):
-            self.playerState["Button6"] = self.baseState
-            self.baseState = "Blue"
-            print("B6")
+        elif self.Button6.isChecked() & (self.baseState == 'Red') & (self.playerState['Button6'] == ''):
+            self.playerState['Button6'] = self.baseState
+            self.baseState = 'Blue'
+            print('B6')
             print(self.playerState)
 
-            self.Button6.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button6.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button6.setIconSize(QtCore.QSize(140,140))
             self.Button6.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button6.isChecked() & (self.baseState == "Blue") & (self.playerState["Button6"] == ""):
-            self.playerState["Button6"] = self.baseState
-            self.baseState = "Red"
-            print("B6")
+        elif self.Button6.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button6'] == ''):
+            self.playerState['Button6'] = self.baseState
+            self.baseState = 'Red'
+            print('B6')
             print(self.playerState)
 
-            self.Button6.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button6.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button6.setIconSize(QtCore.QSize(140,140))
             self.Button6.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button7.isChecked() & (self.baseState == "Red") & (self.playerState["Button7"] == ""):
-            self.playerState["Button7"] = self.baseState
-            self.baseState = "Blue"
-            print("B7")
+        elif self.Button7.isChecked() & (self.baseState == 'Red') & (self.playerState['Button7'] == ''):
+            self.playerState['Button7'] = self.baseState
+            self.baseState = 'Blue'
+            print('B7')
             print(self.playerState)
 
-            self.Button7.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button7.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button7.setIconSize(QtCore.QSize(140,140))
             self.Button7.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button7.isChecked() & (self.baseState == "Blue") & (self.playerState["Button7"] == ""):
-            self.playerState["Button7"] = self.baseState
-            self.baseState = "Red"
-            print("B7")
+        elif self.Button7.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button7'] == ''):
+            self.playerState['Button7'] = self.baseState
+            self.baseState = 'Red'
+            print('B7')
             print(self.playerState)
 
-            self.Button7.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button7.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button7.setIconSize(QtCore.QSize(140,140))
             self.Button7.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button8.isChecked() & (self.baseState == "Red") & (self.playerState["Button8"] == ""):
-            self.playerState["Button8"] = self.baseState
-            self.baseState = "Blue"
-            print("B8")
+        elif self.Button8.isChecked() & (self.baseState == 'Red') & (self.playerState['Button8'] == ''):
+            self.playerState['Button8'] = self.baseState
+            self.baseState = 'Blue'
+            print('B8')
             print(self.playerState)
 
-            self.Button8.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button8.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button8.setIconSize(QtCore.QSize(140,140))
             self.Button8.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button8.isChecked() & (self.baseState == "Blue") & (self.playerState["Button8"] == ""):
-            self.playerState["Button8"] = self.baseState
-            self.baseState = "Red"
-            print("B8")
+        elif self.Button8.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button8'] == ''):
+            self.playerState['Button8'] = self.baseState
+            self.baseState = 'Red'
+            print('B8')
             print(self.playerState)
 
-            self.Button8.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button8.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button8.setIconSize(QtCore.QSize(140,140))
             self.Button8.toggle()
+            self.playersOnMap += 1
 
-        elif self.Button9.isChecked() & (self.baseState == "Red") & (self.playerState["Button9"] == ""):
-            self.playerState["Button9"] = self.baseState
-            self.baseState = "Blue"
-            print("B9")
+        elif self.Button9.isChecked() & (self.baseState == 'Red') & (self.playerState['Button9'] == ''):
+            self.playerState['Button9'] = self.baseState
+            self.baseState = 'Blue'
+            print('B9')
             print(self.playerState)
 
-            self.Button9.setIcon(QtGui.QIcon("img/redPlayer.png"))
+            self.Button9.setIcon(QtGui.QIcon('img/redPlayer.png'))
             self.Button9.setIconSize(QtCore.QSize(140,140))
             self.Button9.toggle()
+            self.playersOnMap += 1
         
-        elif self.Button9.isChecked() & (self.baseState == "Blue") & (self.playerState["Button9"] == ""):
-            self.playerState["Button9"] = self.baseState
-            self.baseState = "Red"
-            print("B9")
+        elif self.Button9.isChecked() & (self.baseState == 'Blue') & (self.playerState['Button9'] == ''):
+            self.playerState['Button9'] = self.baseState
+            self.baseState = 'Red'
+            print('B9')
             print(self.playerState)
 
-            self.Button9.setIcon(QtGui.QIcon("img/bluePlayer.png"))
+            self.Button9.setIcon(QtGui.QIcon('img/bluePlayer.png'))
             self.Button9.setIconSize(QtCore.QSize(140,140))
             self.Button9.toggle()
+            self.playersOnMap += 1
 
         else:
-            print("Already pressed!")
+            print('Already pressed!')
         
         # Restart game
         if self.victoryConditions():
-            # Need implementation
-            self.victoryRestart()
+            self.wipePlayers()
+            self.playersOnMap = 0
+        elif self.remiConditions():
+            self.wipePlayers()
+            self.playersOnMap = 0
         
+
+    # For now remi is after all players are placed and no win
+    def remiConditions(self):
+        if (self.playersOnMap == 9) & (self.victoryConditions() == False):
+            return True
+
 
     # 8 ways to win - returns True if player win
     def victoryConditions(self):
@@ -450,29 +477,29 @@ class Ui_MainWindow(object):
 
 
     # Wipe all players off map and restarts game
-    def victoryRestart(self):
+    def wipePlayers(self):
         self.initButtonLog()
-        self.Button1.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button2.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button3.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button4.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button5.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button6.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button7.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button8.setIcon(QtGui.QIcon("img/whiteBG.png"))
-        self.Button9.setIcon(QtGui.QIcon("img/whiteBG.png"))
+        self.Button1.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button2.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button3.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button4.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button5.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button6.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button7.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button8.setIcon(QtGui.QIcon('img/whiteBG.png'))
+        self.Button9.setIcon(QtGui.QIcon('img/whiteBG.png'))
 
 
     def initUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "TicTacToe"))
-        self.menuRestart.setTitle(_translate("MainWindow", "File"))
-        self.actionRestart.setText(_translate("MainWindow", "Restart"))
-        self.actionRestart.setStatusTip(_translate("MainWindow", "Restart the game"))
-        self.actionRestart.setShortcut(_translate("MainWindow", "R"))
+        MainWindow.setWindowTitle(_translate('MainWindow', 'TicTacToe'))
+        self.menuRestart.setTitle(_translate('MainWindow', 'File'))
+        self.actionRestart.setText(_translate('MainWindow', 'Restart'))
+        self.actionRestart.setStatusTip(_translate('MainWindow', 'Restart the game'))
+        self.actionRestart.setShortcut(_translate('MainWindow', 'R'))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
